@@ -7,13 +7,15 @@ function sendData(hexStr) {
     }, false);
 
     serialPort.open(function () {
-        sys.puts("opend.")     
-        var buff = new Buffer(hexStr, "hex");
-        serialPort.write(buff, function (err, results) {
-            sys.puts("results: " + results);
-            serialPort.close();
-        })
-
+        sys.puts("opend.")
+        try {
+            var buff = new Buffer(hexStr, "hex");
+            serialPort.write(buff, function (err, results) {
+                sys.puts("results: " + results);
+                serialPort.close();
+            });
+        }
+        catch (err) { }
     });
 }
 
