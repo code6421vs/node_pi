@@ -1,33 +1,35 @@
-var base = 16;
+var SerialPort = require("serialport").SerialPort;
+var url = require('url');
 
-function send(buff, sp) {
-  for(var i = 0; i < 15; i+=3) {
-     buff[i] = 0x00;
-     buff[i+1] = base;
-     buff[i+2] = 0x00;
-  }
-  base += 5;
-  sp.write(buff, function(err, results){
-     console.log("results :" + results);
-     if(base > 200)
-        base = 5;
-     setTimeout(function(){
-       send(buff,sp);
-     } ,50);
-  });
+function sendData(hexStr) {
+    var serialPort = new SerialPort("/dev/ttyACM0", {
+        baudrate: 19200
+    }, false);
+
+    serialPort.open(function () {
+        sys.puts("opend.")     
+        var buff = new Buffer(hexStr, "raw");
+        serialPort.write(buff, function (err, results) {
+            sys.puts("results: " + results);
+            serialPort.close();
+        })
+
+    });
 }
 
+var sys = require("sys"),
+my_http = require("http");
+my_http.createServer(function (request, response) {
+    response.writeHeader(200, { "Content-Type": "text/plain" });    
+    var url_parts = url.parse(request.url, true);
+    var query = url_parts.query;
+    sendData(query);
+    response.write(query);
+    response.end();
+}).listen(8080);
+sys.puts("Server Running on 8080");
 
-var SerialPort = require("serialport").SerialPort;
-var serialPort = new SerialPort("/dev/ttyACM0", {
-  baudrate:19200
-},false);
 
-serialPort.open(function() {
-   console.log("opend.");
-   
-   var buff = new Buffer(15);
-   send(buff,serialPort);   
 
-});
+
 
