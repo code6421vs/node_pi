@@ -22,11 +22,8 @@ my_http = require("http");
 my_http.createServer(function (request, response) {
     response.writeHeader(200, { "Content-Type": "text/plain" });    
     var url_parts = url.parse(request.url, true).query;
-    try {
-       sendData(url_parts.data);
-    }
-    catch(err) {
-    }
+    if (url_parts && url_parts.data)
+        sendData(url_parts.data);
     response.end();
 }).listen(8080);
 sys.puts("Server Running on 8080");
