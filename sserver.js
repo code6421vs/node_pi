@@ -8,7 +8,7 @@ function sendData(hexStr) {
 
     serialPort.open(function () {
         sys.puts("opend.")     
-        var buff = new Buffer(hexStr, "raw");
+        var buff = new Buffer(hexStr, "hex");
         serialPort.write(buff, function (err, results) {
             sys.puts("results: " + results);
             serialPort.close();
@@ -21,10 +21,12 @@ var sys = require("sys"),
 my_http = require("http");
 my_http.createServer(function (request, response) {
     response.writeHeader(200, { "Content-Type": "text/plain" });    
-    var url_parts = url.parse(request.url, true);
-    var query = url_parts.query;
-    sendData(query);
-    response.write(query);
+    var url_parts = url.parse(request.url, true).query;
+    try {
+       sendData(url_parts.data);
+    }
+    catch(err) {
+    }
     response.end();
 }).listen(8080);
 sys.puts("Server Running on 8080");
