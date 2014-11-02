@@ -67,17 +67,24 @@ my_http.createServer(function (request, response) {
     response.end();
 }).listen(8080);
 
-// get our custom broadcast server module
- var my = require('./broadcast_server');
- // Instantiate the server, passing the port to listen on
- var server = new my.BroadcastServer(7000);
- // Send time every 2 seconds
- setInterval(function() {
- var now = new Date();
- server.broadcastMessage(now.toTimeString());
- }, 2000);
 
- 
+var dgram = require("dgram");
+
+ var server = dgram.createSocket("udp4");
+
+ server.on("message", function (msg, rinfo) {
+   console.log("server got: " + msg + " from " +
+     rinfo.address + ":" + rinfo.port);
+ });
+
+ server.on("listening", function () {
+   var address = server.address();
+   console.log("server listening " + address.address + ":" + address.port);
+ });
+
+ server.bind(15000);
+
+
 sys.puts("Server Running on 8080");
 
 
