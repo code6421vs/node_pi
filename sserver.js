@@ -39,7 +39,7 @@ function pad(str, len, pad, dir) {
 }
 
 function sendData(hexStr) {
-    var serialPort = new SerialPort("/dev/ttyACM0", {
+    var serialPort = new SerialPort("COM3", {
         baudrate: 19200
     }, false);
 
@@ -66,6 +66,18 @@ my_http.createServer(function (request, response) {
         sendData(url_parts.data);
     response.end();
 }).listen(8080);
+
+// get our custom broadcast server module
+ var my = require('./broadcast_server');
+ // Instantiate the server, passing the port to listen on
+ var server = new my.BroadcastServer(7000);
+ // Send time every 2 seconds
+ setInterval(function() {
+ var now = new Date();
+ server.broadcastMessage(now.toTimeString());
+ }, 2000);
+
+ 
 sys.puts("Server Running on 8080");
 
 
