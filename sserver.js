@@ -81,6 +81,7 @@ my_http.createServer(function (request, response) {
     var url_parts = url.parse(request.url, true).query;
     if (url_parts && url_parts.data)
         sendData(url_parts.data);
+    response.write("OK");
     response.end();
 }).listen(8080);
 
