@@ -57,6 +57,23 @@ function sendData(hexStr) {
     });
 }
 
+function listIPAddresses() {
+   var os = require('os');
+
+   var interfaces = os.networkInterfaces();
+   var addresses = [];
+   for (var k in interfaces) {
+      for (var k2 in interfaces[k]) {
+        var address = interfaces[k][k2];
+        if (address.family === 'IPv4' && !address.internal) {
+            addresses.push(address.address);
+        }
+      }
+   }    
+   return addresses;
+}
+
+
 var sys = require("sys"),
 my_http = require("http");
 my_http.createServer(function (request, response) {
@@ -68,13 +85,23 @@ my_http.createServer(function (request, response) {
 }).listen(8080);
 
 
-var dgram = require("dgram");
+
+
+ var dgram = require("dgram");
+ var ips = listIPAddresses();
 
  var server = dgram.createSocket("udp4");
 
  server.on("message", function (msg, rinfo) {
    console.log("server got: " + msg + " from " +
      rinfo.address + ":" + rinfo.port);
+   var replyMsg = "";
+   for(var i = 0; i < ips.length; i++) {
+       replyMsg += ips[i] +",";
+   }
+   var buff = new Buffer(replyMsg);
+   console.log("data:" + buff +" size:" + buff.length);
+   server.send(buff, 0, buff.length - 1, rinfo.port, rinfo.address);
  });
 
  server.on("listening", function () {
